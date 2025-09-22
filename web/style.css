@@ -1,0 +1,1028 @@
+* {
+  --variable-main-color: #ffffff;
+  --variable-zonename-color: #ffffff;
+  --variable-streetname-color: #ffffff;
+  --variable-direction-color: #ffffff;
+  --variable-zipcode-color: #ffffff;
+  --variable-distance-color: #ffffff;
+
+  --variable-health-color: #00ff37;
+  --variable-hunger-color: #f79616;
+  --variable-thirst-color: #00a2ff;
+  --variable-armor-color: #ee1313;
+  --variable-oxygen-color: #ffffff;
+  --variable-stress-color: #ff6b6b;
+
+  --variable-speed-color: #2cf1ff;
+  --variable-fuel-color: #f10a0a;
+}
+
+/* Player ID Display */
+#player-id {
+  position: absolute;
+  top: 5px;
+  left: 10px;
+  padding: 4px 8px;
+  font-family: "Hanken Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(0, 255, 127, 0.8),
+               0 0 16px rgba(0, 255, 127, 0.4),
+               0 0 24px rgba(0, 255, 127, 0.2),
+               2px 2px 4px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+}
+
+#player-id.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#player-id::before {
+  content: "👤";
+  margin-right: 8px;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+#player-id:hover {
+  transform: translateY(-3px) scale(1.05);
+  text-shadow: 0 0 12px rgba(0, 255, 127, 1),
+               0 0 20px rgba(0, 255, 127, 0.6),
+               0 0 30px rgba(0, 255, 127, 0.3),
+               3px 3px 6px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5),
+              0 0 25px rgba(0, 255, 127, 0.3);
+}
+
+* {
+  --size: 0px;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+body {
+  overflow: hidden;
+}
+
+/* Bank Balance Display */
+#bank-balance {
+  position: fixed;
+  top: 180px;
+  right: 25px;
+  padding: 10px 18px;
+  font-family: "Hanken Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: #00ff7f;
+  text-shadow: 0 0 10px rgba(0, 255, 127, 0.8),
+               0 0 20px rgba(0, 255, 127, 0.4),
+               0 0 30px rgba(0, 255, 127, 0.2),
+               2px 2px 4px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  text-align: right;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  transform: translateY(-10px);
+}
+
+#bank-balance.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#bank-balance::before {
+  content: "🏦";
+  margin-right: 8px;
+  color: #00ff7f;
+  font-weight: 800;
+  font-size: 18px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  opacity: 1;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+#bank-balance:hover {
+  transform: translateY(-3px) scale(1.05);
+  text-shadow: 0 0 15px rgba(0, 255, 127, 1),
+               0 0 25px rgba(0, 255, 127, 0.6),
+               0 0 35px rgba(0, 255, 127, 0.3),
+               3px 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Cash Display */
+#cash-balance {
+  position: fixed;
+  top: 200px;
+  right: 25px;
+  padding: 10px 18px;
+  font-family: "Hanken Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: #ffaa00;
+  text-shadow: 0 0 10px rgba(255, 170, 0, 0.8),
+               0 0 20px rgba(255, 170, 0, 0.4),
+               0 0 30px rgba(255, 170, 0, 0.2),
+               2px 2px 4px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  text-align: right;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  transform: translateY(-10px);
+}
+
+#cash-balance.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#cash-balance::before {
+  content: "💰";
+  margin-right: 8px;
+  color: #ffaa00;
+  font-weight: 800;
+  font-size: 18px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  opacity: 1;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+#cash-balance:hover {
+  transform: translateY(-3px) scale(1.05);
+  text-shadow: 0 0 15px rgba(255, 170, 0, 1),
+               0 0 25px rgba(255, 170, 0, 0.6),
+               0 0 35px rgba(255, 170, 0, 0.3),
+               3px 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Combined Money Display */
+#money-display {
+  position: fixed;
+  top: 180px;
+  right: 25px;
+  padding: 10px 18px;
+  font-family: "Hanken Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  text-align: right;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  transform: translateY(-10px);
+}
+
+#money-display.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#bank-amount {
+  color: #00ff7f;
+  text-shadow: 0 0 10px rgba(0, 255, 127, 0.8),
+               0 0 20px rgba(0, 255, 127, 0.4),
+               0 0 30px rgba(0, 255, 127, 0.2),
+               2px 2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+#bank-amount::before {
+  content: "🏦";
+  margin-right: 6px;
+  font-size: 16px;
+}
+
+#cash-amount {
+  color: #ffaa00;
+  text-shadow: 0 0 10px rgba(255, 170, 0, 0.8),
+               0 0 20px rgba(255, 170, 0, 0.4),
+               0 0 30px rgba(255, 170, 0, 0.2),
+               2px 2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+#cash-amount::before {
+  content: "💰";
+  margin-right: 6px;
+  font-size: 16px;
+}
+
+.money-separator {
+  color: #666;
+  font-size: 18px;
+  font-weight: 300;
+}
+
+#money-display:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+#money-display:hover #bank-amount {
+  text-shadow: 0 0 15px rgba(0, 255, 127, 1),
+               0 0 25px rgba(0, 255, 127, 0.6),
+               0 0 35px rgba(0, 255, 127, 0.3),
+               3px 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+#money-display:hover #cash-amount {
+  text-shadow: 0 0 15px rgba(255, 170, 0, 1),
+               0 0 25px rgba(255, 170, 0, 0.6),
+               0 0 35px rgba(255, 170, 0, 0.3),
+               3px 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Job Display */
+#job-display {
+  position: fixed;
+  top: 150px;
+  right: 25px;
+  font-family: "Hanken Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #4fc3f7;
+  text-shadow: 0 0 2px rgba(68, 194, 253, 0.8),
+               0 0 4px rgba(71, 193, 250, 0.493),
+               0 0 6px rgba(70, 194, 252, 0.37),
+               2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-align: right;
+  min-width: 220px;
+  padding: 12px 20px;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  transform: translateY(-10px);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+#job-display.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#job-display::before {
+  content: "💼";
+  margin-right: 10px;
+  color: #4fc3f7;
+  font-size: 20px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  display: inline-block;
+  vertical-align: middle;
+}
+
+#job-display:hover {
+  transform: translateY(-3px) scale(1.05);
+  text-shadow: 0 0 15px rgba(79, 195, 247, 1),
+               0 0 25px rgba(79, 195, 247, 0.6),
+               0 0 35px rgba(79, 195, 247, 0.3),
+               3px 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Off Duty Status Styling */
+#job-display.off-duty {
+  color: #ff6b6b;
+  text-shadow: 0 0 8px rgba(255, 107, 107, 0.8),
+               0 0 16px rgba(255, 107, 107, 0.4),
+               0 0 24px rgba(255, 107, 107, 0.2),
+               2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#job-display.off-duty:hover {
+  text-shadow: 0 0 15px rgba(255, 107, 107, 1),
+               0 0 25px rgba(255, 107, 107, 0.6),
+               0 0 35px rgba(255, 107, 107, 0.3),
+               3px 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Money Change Animations */
+@keyframes moneyIncrease {
+  0% {
+    transform: translateY(0) scale(1);
+    color: inherit;
+  }
+  50% {
+    transform: translateY(-8px) scale(1.1);
+    color: #00ff00;
+    text-shadow: 0 0 20px rgba(0, 255, 0, 1),
+                 0 0 30px rgba(0, 255, 0, 0.8),
+                 3px 3px 6px rgba(0, 0, 0, 0.7);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    color: inherit;
+  }
+}
+
+@keyframes moneyDecrease {
+  0% {
+    transform: translateY(0) scale(1);
+    color: inherit;
+  }
+  50% {
+    transform: translateY(-8px) scale(1.1);
+    color: #ff0000;
+    text-shadow: 0 0 20px rgba(255, 0, 0, 1),
+                 0 0 30px rgba(255, 0, 0, 0.8),
+                 3px 3px 6px rgba(0, 0, 0, 0.7);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    color: inherit;
+  }
+}
+
+@keyframes moneyPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Money change indicators */
+.money-change-indicator {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  animation: indicatorFloat 0.3s ease-out forwards;
+  z-index: 1000;
+}
+
+.money-change-indicator.positive {
+  color: #00ff00;
+  background: rgba(0, 255, 0, 0.1);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.money-change-indicator.negative {
+  color: #ff4444;
+  background: rgba(255, 68, 68, 0.1);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+}
+
+.money-change-indicator.show {
+  opacity: 1;
+}
+
+@keyframes indicatorFloat {
+  from {
+    transform: translateX(-50%) translateY(0);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(-10px);
+    opacity: 1;
+  }
+}
+
+/* Animation Classes */
+.money-increase {
+  animation: moneyIncrease 0.8s ease-out;
+}
+
+.money-decrease {
+  animation: moneyDecrease 0.8s ease-out;
+}
+
+.money-pulse {
+  animation: moneyPulse 0.3s ease-in-out;
+}
+
+/* Change Indicator */
+.money-change-indicator {
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: bold;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.money-change-indicator.show {
+  opacity: 1;
+  right: -25px;
+}
+
+.money-change-indicator.positive {
+  color: #00ff00;
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.8);
+}
+
+.money-change-indicator.negative {
+  color: #ff0000;
+  text-shadow: 0 0 8px rgba(255, 0, 0, 0.8);
+}
+#location {
+  display: flex;
+  position: absolute;
+  bottom: 30px;
+  left: 310px;
+  padding: 15px 30px;
+  opacity: 0;
+  transition: 0.2s;
+  width: 400px;
+}
+#location > img {
+  width: 50px;
+  height: 50px;
+  filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.6)) 
+          drop-shadow(0 0 24px rgba(0, 212, 255, 0.3));
+  transition: all 0.3s ease;
+}
+
+#location > img:hover {
+  filter: drop-shadow(0 0 16px rgba(0, 212, 255, 0.8)) 
+          drop-shadow(0 0 32px rgba(0, 212, 255, 0.4));
+  transform: scale(1.1);
+}
+#location > #zone {
+  font-family: "Hanken Grotesk";
+  font-weight: 300;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--variable-zonename-color);
+  position: absolute;
+  left: 80px;
+  top: 2px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6), 
+               0 0 8px rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+}
+#location > #streetname {
+  font-family: "Hanken Grotesk";
+  font-weight: 600;
+  font-size: 18px;
+  color: #ffffff;
+  position: absolute;
+  padding-bottom: 4px;
+  padding-right: 60px;
+  left: 80px;
+  top: 20px;
+  border-bottom: 2px solid rgba(0, 212, 255, 0.6);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7), 
+               0 0 2px rgba(0, 249, 185, 0.8),
+               0 0 4px rgba(0, 249, 185, 0.6),
+               0 0 6px rgba(0, 249, 185, 0.4);
+  letter-spacing: 0.8px;
+}
+.logo {
+  position: absolute;
+  top: 0px;
+  right: 30px;
+  width: 130px;
+  /* Adjust as needed */
+  height: auto;
+}
+/* Container for the image and effect */
+.img-wrapper {
+  position: absolute;
+  top: 0px;
+  right: 30px;
+  width: 130px;
+  height: auto;
+  overflow: hidden; 
+  display: inline-block;
+  
+  /* Use the image itself as a mask */
+  mask-image: url('https://cdn.discordapp.com/attachments/925008543642439740/1418135470247903424/image.png?ex=68cd0513&is=68cbb393&hm=418dc370a501f77e7bf3b2d4b310a6bb273a63de9fa609f5ecdd24650313d945&');
+  -webkit-mask-image: url('https://cdn.discordapp.com/attachments/925008543642439740/1418135470247903424/image.png?ex=68cd0513&is=68cbb393&hm=418dc370a501f77e7bf3b2d4b310a6bb273a63de9fa609f5ecdd24650313d945&');
+  mask-mode: alpha;
+  -webkit-mask-mode: alpha;
+  
+  /* Ensure the mask covers the whole area */
+  mask-size: cover;
+  -webkit-mask-size: cover;
+}
+
+/* Hide the source image since we are using it as a mask */
+.img-wrapper img {
+  display: block; 
+  width: 100%;
+  height: 100%;
+  opacity: 0; /* Hide the original image */
+}
+
+/* The light sweep effect pseudo-element now uses the wrapper as a mask */
+.img-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%; 
+  width: 50%;
+  height: 100%;
+  
+  /* Creates a transparent-to-white-to-transparent gradient */
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  
+  transform: skewX(-20deg);
+  animation: sweep 5s linear infinite;
+  z-index: 1; /* Ensure the light sweep is on top */
+}
+
+/* Keyframes for the animation */
+@keyframes sweep {
+  0% {
+    left: -75%;
+  }
+  100% {
+    left: 125%;
+  }
+}
+.bottom {
+  position: absolute;
+  top: 55px;
+  left: 80px;
+}
+.bottom > #direction {
+  font-family: "Hanken Grotesk";
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--variable-direction-color);
+  background: linear-gradient(135deg, 
+    rgba(0, 255, 127, 0.2), 
+    rgba(0, 212, 255, 0.2));
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 255, 127, 0.4);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  letter-spacing: 1px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 255, 127, 0.3);
+  display: inline-block;
+}
+.bottom > #zipcode {
+  font-family: "Hanken Grotesk";
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--variable-zipcode-color);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  letter-spacing: 0.5px;
+  display: inline-block;
+  margin-left: 8px;
+}
+.bottom > #distance {
+  font-family: "Hanken Grotesk";
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--variable-distance-color);
+  background: linear-gradient(135deg, 
+    rgba(255, 165, 0, 0.2), 
+    rgba(255, 69, 0, 0.2));
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 165, 0, 0.4);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(255, 165, 0, 0.3);
+  font-weight: 600;
+  display: inline-block;
+  margin-left: 8px;
+}
+#status {
+  width: 300px;
+  height: 150px;
+  border-radius: 10px;
+  position: absolute;
+  bottom: 30px;
+  right: 20px;
+  overflow: hidden;
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+  opacity: 0;
+}
+#status img {
+  height: 20px;
+  width: 20px;
+}
+#status > .health,
+#status > .thirst,
+#status > .food,
+#status > .armor,
+#status > .oxygen,
+#status > .stress {
+  position: relative;
+  height: 30px;
+}
+.health > img,
+.armor > img,
+.thirst > img,
+.food > img,
+.oxygen > img,
+.stress > img {
+  position: absolute;
+  right: 10px;
+  top: 4px;
+}
+
+.health > img {
+  filter: drop-shadow(0 0 8px rgba(0, 255, 55, 0.6)) drop-shadow(0 0 16px rgba(0, 255, 55, 0.3));
+}
+
+.armor > img {
+  filter: drop-shadow(0 0 8px rgba(238, 19, 19, 0.6)) drop-shadow(0 0 16px rgba(238, 19, 19, 0.3));
+}
+
+.thirst > img {
+  filter: drop-shadow(0 0 8px rgba(0, 162, 255, 0.6)) drop-shadow(0 0 16px rgba(0, 162, 255, 0.3));
+}
+
+.food > img {
+  filter: drop-shadow(0 0 8px rgba(247, 150, 22, 0.6)) drop-shadow(0 0 16px rgba(247, 150, 22, 0.3));
+}
+
+.oxygen > img {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 16px rgba(255, 255, 255, 0.3));
+}
+
+.stress > img {
+  filter: drop-shadow(0 0 8px rgba(255, 107, 107, 0.6)) drop-shadow(0 0 16px rgba(255, 107, 107, 0.3));
+}
+.health > hr,
+.armor > hr,
+.thirst > hr,
+.food > hr,
+.oxygen > hr,
+.stress > hr {
+  position: absolute;
+  transition: 0.2s;
+  right: 40px;
+  top: 13px;
+  width: 150px;
+  height: 2px;
+  border-radius: 10px;
+  outline: none;
+  border: none;
+  overflow: visible;
+  background-color: var(--variable-main-color);
+}
+.health > hr::before,
+.armor > hr::before,
+.thirst > hr::before,
+.food > hr::before,
+.oxygen > hr::before,
+.stress > hr::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--size));
+  transition: 0.2s;
+  width: var(--size);
+  height: 2px;
+  border-radius: 10px;
+  outline: none;
+  border: none;
+  background-color: #6b6b6bbe;
+}
+.health > span,
+.armor > span,
+.thirst > span,
+.food > span,
+.oxygen > span,
+.stress > span {
+  position: absolute;
+  font-family: "Hanken Grotesk";
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--variable-main-color);
+  right: 40px;
+  top: 2px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  letter-spacing: 0.5px;
+}
+.health > .title,
+.armor > .title,
+.thirst > .title,
+.food > .title,
+.oxygen > .title,
+.stress > .title {
+  position: absolute;
+  font-family: "Hanken Grotesk";
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--variable-main-color);
+  left: 110px;
+  top: 2px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.health > hr {
+  background-color: var(--variable-health-color);
+  box-shadow: 0 0 8px rgba(0, 255, 55, 0.6), 
+              0 0 16px rgba(0, 255, 55, 0.4), 
+              0 0 32px rgba(0, 255, 55, 0.2),
+              0 0 48px rgba(0, 255, 55, 0.1);
+}
+.armor > hr {
+  background-color: var(--variable-armor-color);
+  box-shadow: 0 0 8px rgba(238, 19, 19, 0.6), 
+              0 0 16px rgba(238, 19, 19, 0.4), 
+              0 0 32px rgba(238, 19, 19, 0.2),
+              0 0 48px rgba(238, 19, 19, 0.1);
+}
+.food > hr {
+  background-color: var(--variable-hunger-color);
+  box-shadow: 0 0 8px rgba(247, 150, 22, 0.6), 
+              0 0 16px rgba(247, 150, 22, 0.4), 
+              0 0 32px rgba(247, 150, 22, 0.2),
+              0 0 48px rgba(247, 150, 22, 0.1);
+}
+.thirst > hr {
+  background-color: var(--variable-thirst-color);
+  box-shadow: 0 0 8px rgba(0, 162, 255, 0.6), 
+              0 0 16px rgba(0, 162, 255, 0.4), 
+              0 0 32px rgba(0, 162, 255, 0.2),
+              0 0 48px rgba(0, 162, 255, 0.1);
+}
+.oxygen > hr {
+  background-color: var(--variable-oxygen-color);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 
+              0 0 16px rgba(255, 255, 255, 0.4), 
+              0 0 32px rgba(255, 255, 255, 0.2),
+              0 0 48px rgba(255, 255, 255, 0.1);
+}
+.stress > hr {
+  background-color: var(--variable-stress-color);
+  box-shadow: 0 0 8px rgba(255, 107, 107, 0.6), 
+              0 0 16px rgba(255, 107, 107, 0.4), 
+              0 0 32px rgba(255, 107, 107, 0.2),
+              0 0 48px rgba(255, 107, 107, 0.1);
+}
+#speedometer {
+  position: absolute;
+  bottom: -50px;
+  left: calc(50% - 125px);
+  width: 250px;
+  transform: scale(0.7);
+  transition: 0.2s;
+  opacity: 0;
+}
+#speedometer #speed {
+  height: 200px;
+  margin: 20px auto;
+  display: block;
+}
+#speedometer .fuel {
+  position: absolute;
+  bottom: 77px;
+  right: 25px;
+  height: 30px;
+  width: 30px;
+  filter: drop-shadow(0 0 4px rgba(255, 165, 0, 0.5)) 
+          drop-shadow(0 0 8px rgba(255, 165, 0, 0.3));
+  transition: all 0.3s ease;
+}
+#speedometer .beam {
+  position: absolute;
+  bottom: 30px;
+  right: 90px;
+  height: 30px;
+  width: 30px;
+  filter: drop-shadow(0 0 4px rgba(0, 255, 255, 0.5)) 
+          drop-shadow(0 0 8px rgba(0, 255, 255, 0.3));
+  transition: all 0.3s ease;
+}
+#speedometer .engine {
+  position: absolute;
+  bottom: 30px;
+  right: 180px;
+  height: 30px;
+  width: 30px;
+  filter: drop-shadow(0 0 4px rgba(255, 69, 0, 0.5)) 
+          drop-shadow(0 0 8px rgba(255, 69, 0, 0.3));
+  transition: all 0.3s ease;
+}
+/* General disabled state for all speedometer icons */
+.disabled {
+  opacity: 0.4;
+}
+
+/* Specific seatbelt states with higher specificity */
+#speedometer .seatbelt {
+  position: absolute;
+  bottom: 35px;
+  right: 135px;
+  height: 25px;
+  width: 25px;
+  transition: all 0.3s ease;
+}
+
+/* Seatbelt enabled state (when NOT disabled) */
+#speedometer .seatbelt:not(.disabled) {
+  filter: drop-shadow(0 0 2px rgba(0, 255, 0, 0.5)) 
+          drop-shadow(0 0 4px rgba(0, 255, 0, 0.3)) !important;
+  transform: scale(1.1);
+  opacity: 1 !important;
+}
+
+/* Seatbelt disabled state (when seatbelt is off) */
+#speedometer .seatbelt.disabled {
+  opacity: 0.3 !important;
+  filter: grayscale(1) 
+          drop-shadow(0 0 2px rgba(255, 0, 0, 0.4)) 
+          drop-shadow(0 0 4px rgba(255, 0, 0, 0.2)) !important;
+  transform: scale(0.9);
+}
+#speedometer .speedpath {
+  stroke: #6b6b6bbe;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+#speedometer .fuelpath {
+  stroke: #6b6b6bbe;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+#speedometer .fuelvalue {
+  stroke-width: 4;
+  stroke: var(--variable-fuel-color);
+  stroke-dasharray: 126 500;
+  stroke-dashoffset: 126;
+  animation: dash 3s 0.5s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 3px rgba(241, 10, 10, 0.4)) 
+          drop-shadow(0 0 6px rgba(241, 10, 10, 0.2));
+  transition: stroke 0.3s ease, filter 0.3s ease;
+}
+
+/* Fuel level color classes */
+#speedometer .fuelvalue.normal-fuel {
+  stroke: white;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.4)) 
+          drop-shadow(0 0 6px rgba(255, 255, 255, 0.2));
+}
+
+#speedometer .fuelvalue.low-fuel {
+  stroke: orange;
+  filter: drop-shadow(0 0 3px rgba(255, 165, 0, 0.4)) 
+          drop-shadow(0 0 6px rgba(255, 165, 0, 0.2));
+}
+
+#speedometer .fuelvalue.critical-fuel {
+  stroke: #fa1818;
+  filter: drop-shadow(0 0 3px rgba(250, 24, 24, 0.4)) 
+          drop-shadow(0 0 6px rgba(250, 24, 24, 0.2));
+}
+#speedometer .speedvalue {
+  stroke-width: 5;
+  stroke: var(--variable-speed-color);
+  stroke-dasharray: 126 500;
+  stroke-dashoffset: 126;
+  animation: dash 3s 0.5s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 4px rgba(44, 241, 255, 0.4)) 
+          drop-shadow(0 0 8px rgba(44, 241, 255, 0.2));
+  transition: stroke 0.3s ease, filter 0.3s ease;
+}
+
+/* Speed range color classes */
+#speedometer .speedvalue.safe-speed {
+  stroke: #00ff88;
+  filter: drop-shadow(0 0 4px rgba(0, 255, 136, 0.4)) 
+          drop-shadow(0 0 8px rgba(0, 255, 136, 0.2));
+}
+
+#speedometer .speedvalue.moderate-speed {
+  stroke: #00d4ff;
+  filter: drop-shadow(0 0 4px rgba(0, 212, 255, 0.4)) 
+          drop-shadow(0 0 8px rgba(0, 212, 255, 0.2));
+}
+
+#speedometer .speedvalue.high-speed {
+  stroke: #ff6b00;
+  filter: drop-shadow(0 0 4px rgba(255, 107, 0, 0.4)) 
+          drop-shadow(0 0 8px rgba(255, 107, 0, 0.2));
+}
+
+#speedometer .speedvalue.dangerous-speed {
+  stroke: #ff0000;
+  filter: drop-shadow(0 0 4px rgba(255, 0, 0, 0.4)) 
+          drop-shadow(0 0 8px rgba(255, 0, 0, 0.2));
+}
+#speedometer.low-speed .speedvalue {
+  stroke-dasharray: 63 500; /* New value for low speed */
+  stroke-dashoffset: 63; /* New value for low speed */
+  stroke: green; /* Change color for low speed */
+  animation: dash-low 3s 0.5s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+  filter: drop-shadow(0 0 4px rgba(0, 255, 0, 0.4)) 
+          drop-shadow(0 0 8px rgba(0, 255, 0, 0.2));
+}
+
+@keyframes dash-low {
+  from {
+    stroke-dashoffset: 200;
+  }
+  to {
+    stroke-dashoffset: 63;
+  }
+}
+#speedometer span {
+  position: absolute;
+  font-family: "DS-Digital", "Calculator", "Seven Segment", monospace;
+  font-weight: 700;
+  font-size: 52px;
+  left: 30px;
+  top: 70px;
+  width: 140px;
+  text-align: center;
+  color: #ffffff;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.6),
+               0 0 6px rgba(255, 255, 255, 0.4),
+               0 0 10px rgba(255, 255, 255, 0.2);
+  letter-spacing: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+#speedometer span::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: transparent;
+  -webkit-text-stroke: 1px #ffffff;
+  z-index: -1;
+}
+#speedometer #speedtextkm::after {
+  content: "KMH";
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Hanken Grotesk", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 16px;
+  color: #00d4ff;
+  text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+  letter-spacing: 1px;
+}
+#speedometer #speedtextmiles::after {
+  content: "MPH";
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Hanken Grotesk", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 16px;
+  color: #00d4ff;
+  text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+  letter-spacing: 1px;
+}
+@keyframes dash {
+  to {
+    stroke-dashoffset: 1;
+  }
+}
+#status > .voice {
+  width: 25px;
+  height: 17px;
+  align-self: flex-end;
+  margin-bottom: 20px;
+  margin-right: 20px;
+  filter: drop-shadow(0 0 6px rgba(0, 255, 127, 0.6)) 
+          drop-shadow(0 0 12px rgba(0, 255, 127, 0.3));
+  transition: all 0.3s ease;
+}
+
+#status > .voice.disabled {
+  filter: grayscale(1) 
+          drop-shadow(0 0 4px rgba(255, 255, 255, 0.3)) 
+          drop-shadow(0 0 8px rgba(255, 255, 255, 0.1));
+  opacity: 0.5;
+}
