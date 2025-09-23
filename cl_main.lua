@@ -345,8 +345,8 @@ local function vehicleLoop(veh)
                     visible = false
                 })
             end
+            Wait(Config.globalUpdateTime)
         end
-        Wait(Config.globalUpdateTime)
     end)
     --
     -- HUD SPEEDOMETER
