@@ -27,7 +27,6 @@ if Config.componentsDisabler then
 end
 
 local bypass = false
-local cinematic
 
 RegisterCommand('minimap', function()
     bypass = not bypass
@@ -36,8 +35,7 @@ RegisterCommand('minimap', function()
 end, false)
 
 RegisterCommand('cinematic', function()
-    cinematic = not cinematic
-    hudVisible = not cinematic
+    hudVisible = not hudVisible
     SendNUIMessage({
         component = 'hud',
         visible = hudVisible
@@ -152,56 +150,6 @@ function Init()
     UpdateInfo()
     bypass = GetResourceKvpInt("toggle_minimap") == 1
     DisplayRadar(bypass)
-    CreateThread(function()
-        SendNUIMessage({
-            component = 'position',
-            visible = false
-        })
-        while true do
-            if LocalPlayer.state.isLoggedIn then
-                if inVehicle and Config.location.enabled and hudVisible then
-                    local playerCoords = GetEntityCoords(cache.ped)
-                    local heading = GetEntityHeading(cache.ped)
-                    local zone = GetNameOfZone(playerCoords.x, playerCoords.y, playerCoords.z)
-                    local streetname, _ = GetStreetNameAtCoord(playerCoords.x, playerCoords.y, playerCoords.z)
-                    local streetnameText = GetStreetNameFromHashKey(streetname)
-                    local distance = #(playerCoords.xy - activeCoords)
-                    local distanceText = string.format('%sm', math.floor(distance))
-                    local zoneText = streetnameText
-                    if zones[string.upper(zone)] then
-                        zoneText = zones[string.upper(zone)]
-                    end
-                    local nearestIndex, nearestDist
-                    for i = 1, #postals do
-                        local dist = #(playerCoords.xy - postals[i][1])
-
-                        if not nearestDist or dist < nearestDist then
-                            nearestIndex = i
-                            nearestDist = dist
-                            activeCoords = postals[i][1]
-                        end
-                    end
-                    local code = postals[nearestIndex].code
-                    postalText = string.format('CP %s', code)
-                    SendNUIMessage({
-                        component = 'position',
-                        heading = heading,
-                        postal = postalText,
-                        direction = getCardinalDirection(heading),
-                        distance = distanceText,
-                        street = streetnameText,
-                        zone = zoneText
-                    })
-                else
-                    SendNUIMessage({
-                        component = 'position',
-                        visible = false
-                    })
-                end
-            end
-            Wait(Config.globalUpdateTime)
-        end
-    end)
     local visiblestate = false
     CreateThread(function()
         while true do
@@ -243,61 +191,6 @@ function Init()
         end
     end)
 
-    --
-    -- HUD SPEEDOMETER
-    local vehiclehud = false
-    CreateThread(function()
-        while true do
-            if Config.speedometer.enabled and playerloaded and inVehicle and hudVisible then
-                local multipler = Config.useMiles and 2.236936 or 3.6
-                local maxSpeed = GetVehicleEstimatedMaxSpeed(inVehicle) * multipler
-                local speed = GetEntitySpeed(inVehicle) * multipler
-                local maxFuel = GetVehicleHandlingFloat(inVehicle, 'CHandlingData', 'fPetrolTankVolume')
-                local fuel = GetVehicleFuelLevel(inVehicle)
-                local hasMotor = true
-                local isElectric = false
-
-                if maxFuel < 5.0 then
-                    hasMotor = false
-                end
-
-                if Config.LegacyFuel then
-                    fuel = math.floor(exports['LegacyFuel']:GetFuel(inVehicle))
-                end
-
-                local model = GetEntityModel(inVehicle)
-                isElectric = Config.electricVehicles[model]
-                local _, _, highbeams = GetVehicleLightsState(inVehicle)
-                vehiclehud = true
-                SendNUIMessage({
-                    component = 'speedometer',
-                    framework = Config.framework,
-                    seatbeltVisible = Config.enableSeatBelt,
-                    fuelVisible = Config.enableFuel,
-                    useMiles = Config.useMiles,
-                    speed = speed,
-                    maxspeed = maxSpeed,
-                    fuel = fuel,
-                    hasmotor = hasMotor,
-                    iselectric = isElectric,
-                    maxfuel = maxFuel,
-                    highbeams = highbeams,
-                    engine = GetIsVehicleEngineRunning(inVehicle),
-                    seatbelt = seatbelt
-                })
-            else
-                if vehiclehud then
-                    vehiclehud = false
-                    SendNUIMessage({
-                        component = 'speedometer',
-                        visible = false
-                    })
-                end
-            end
-
-            Wait(Config.globalUpdateTime)
-        end
-    end)
     -- Hide HUD when map/pause menu is open
     CreateThread(function()
         local lastPauseState = false
@@ -424,6 +317,97 @@ function Init()
     end)
 end
 
+local function vehicleLoop(veh)
+    CreateThread(function()
+        SendNUIMessage({
+            component = 'position',
+            visible = false
+        })
+        while inVehicle do
+            if Config.location.enabled and hudVisible then
+                local playerCoords = GetEntityCoords(cache.ped)
+                local heading = GetEntityHeading(cache.ped)
+                local zone = GetNameOfZone(playerCoords.x, playerCoords.y, playerCoords.z)
+                local streetname, _ = GetStreetNameAtCoord(playerCoords.x, playerCoords.y, playerCoords.z)
+                local streetnameText = GetStreetNameFromHashKey(streetname)
+                local zoneText = streetnameText
+                if zones[string.upper(zone)] then
+                    zoneText = zones[string.upper(zone)]
+                end
+                SendNUIMessage({
+                    component = 'position',
+                    heading = heading,
+                    postal = '',
+                    direction = getCardinalDirection(heading),
+                    distance = '',
+                    street = streetnameText,
+                    zone = zoneText
+                })
+            else
+                SendNUIMessage({
+                    component = 'position',
+                    visible = false
+                })
+            end
+        end
+        Wait(Config.globalUpdateTime)
+    end)
+    --
+    -- HUD SPEEDOMETER
+    local vehiclehud = false
+    CreateThread(function()
+        while inVehicle do
+            if Config.speedometer.enabled and playerloaded and hudVisible then
+                local multipler = Config.useMiles and 2.236936 or 3.6
+                local maxSpeed = GetVehicleEstimatedMaxSpeed(inVehicle) * multipler
+                local speed = GetEntitySpeed(inVehicle) * multipler
+                local maxFuel = GetVehicleHandlingFloat(inVehicle, 'CHandlingData', 'fPetrolTankVolume')
+                local fuel = GetVehicleFuelLevel(inVehicle)
+                local hasMotor = true
+                local isElectric = false
+                if maxFuel < 5.0 then
+                    hasMotor = false
+                end
+
+                if Config.LegacyFuel then
+                    fuel = math.floor(exports['LegacyFuel']:GetFuel(inVehicle))
+                end
+
+                local model = GetEntityModel(inVehicle)
+                isElectric = Config.electricVehicles[model]
+                local _, _, highbeams = GetVehicleLightsState(inVehicle)
+                vehiclehud = true
+                SendNUIMessage({
+                    component = 'speedometer',
+                    framework = Config.framework,
+                    seatbeltVisible = Config.enableSeatBelt,
+                    fuelVisible = Config.enableFuel,
+                    useMiles = Config.useMiles,
+                    speed = speed,
+                    maxspeed = maxSpeed,
+                    fuel = fuel,
+                    hasmotor = hasMotor,
+                    iselectric = isElectric,
+                    maxfuel = maxFuel,
+                    highbeams = highbeams,
+                    engine = GetIsVehicleEngineRunning(inVehicle),
+                    seatbelt = seatbelt
+                })
+            else
+                if vehiclehud then
+                    vehiclehud = false
+                    SendNUIMessage({
+                        component = 'speedometer',
+                        visible = false
+                    })
+                end
+            end
+
+            Wait(Config.globalUpdateTime)
+        end
+    end)
+end
+
 -- Driving stress detection (speed without seatbelt)
 local function vehicleStressLoop(veh)
     CreateThread(function()
@@ -467,6 +451,7 @@ lib.onCache('vehicle', function(value)
             return
         end
         vehicleStressLoop(value)
+        vehicleLoop(value)
     else
         DisplayRadar(bypass)
         seatbelt = false
