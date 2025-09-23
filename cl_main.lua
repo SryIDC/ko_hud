@@ -38,6 +38,10 @@ end, false)
 RegisterCommand('cinematic', function()
     cinematic = not cinematic
     hudVisible = not cinematic
+    SendNUIMessage({
+        component = 'hud',
+        visible = hudVisible
+    })
 end, false)
 
 --
@@ -107,13 +111,13 @@ function UpdateInfo()
     SendNUIMessage({
         component = 'playerId',
         visible = hudVisible,
-        playerId = hudVisible and cache.serverId
+        playerId = cache.serverId
     })
     SendNUIMessage({
         component = 'job',
         visible = hudVisible,
-        jobName = hudVisible and job.label,
-        jobGrade = hudVisible and job.grade.name .. (job.onduty and '' or ' (Off Duty)')
+        jobName = job.label,
+        jobGrade = job.grade.name .. (job.onduty and '' or ' (Off Duty)')
     })
 end
 
@@ -489,12 +493,12 @@ AddEventHandler('qbx_seatbelt:client:togglebelt', function(bool)
 end)
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(job)
     job = job
-     UpdateInfo()
+    UpdateInfo()
 end)
 
 RegisterNetEvent('QBCore:Client:SetDuty', function(onDuty)
     job.onduty = onDuty
-     UpdateInfo()
+    UpdateInfo()
 end)
 
 CreateThread(function()
