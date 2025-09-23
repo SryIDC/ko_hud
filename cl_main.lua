@@ -46,18 +46,18 @@ end, false)
 -- HUD LOCATION
 --
 
-local activeCoords = vec2(0.0, 0.0)
-local postalText = 'CP 0000'
-local postals = {}
+-- local activeCoords = vec2(0.0, 0.0)
+-- local postalText = 'CP 0000'
+-- local postals = {}
 local zones = {}
 
 CreateThread(function()
-    local postalsJson = LoadResourceFile(GetCurrentResourceName(), 'zips.json')
-    postalsJson = json.decode(postalsJson)
+    -- local postalsJson = LoadResourceFile(GetCurrentResourceName(), 'zips.json')
+    -- postalsJson = json.decode(postalsJson)
 
-    for i, postal in ipairs(postalsJson) do
-        postals[i] = { vec2(postal.x, postal.y), code = postal.code }
-    end
+    -- for i, postal in ipairs(postalsJson) do
+    --     postals[i] = { vec2(postal.x, postal.y), code = postal.code }
+    -- end
 
     local zonesJson = LoadResourceFile(GetCurrentResourceName(), 'zones.json')
     zonesJson = json.decode(zonesJson)
@@ -319,12 +319,8 @@ end
 
 local function vehicleLoop(veh)
     CreateThread(function()
-        SendNUIMessage({
-            component = 'position',
-            visible = false
-        })
-        while inVehicle do
-            if Config.location.enabled and hudVisible then
+        while cache.vehicle do
+            if hudVisible then
                 local playerCoords = GetEntityCoords(cache.ped)
                 local heading = GetEntityHeading(cache.ped)
                 local zone = GetNameOfZone(playerCoords.x, playerCoords.y, playerCoords.z)
@@ -356,8 +352,8 @@ local function vehicleLoop(veh)
     -- HUD SPEEDOMETER
     local vehiclehud = false
     CreateThread(function()
-        while inVehicle do
-            if Config.speedometer.enabled and playerloaded and hudVisible then
+        while cache.vehicle do
+            if hudVisible then
                 local multipler = Config.useMiles and 2.236936 or 3.6
                 local maxSpeed = GetVehicleEstimatedMaxSpeed(inVehicle) * multipler
                 local speed = GetEntitySpeed(inVehicle) * multipler
@@ -368,7 +364,6 @@ local function vehicleLoop(veh)
                 if maxFuel < 5.0 then
                     hasMotor = false
                 end
-
                 if Config.LegacyFuel then
                     fuel = math.floor(exports['LegacyFuel']:GetFuel(inVehicle))
                 end
@@ -447,11 +442,11 @@ lib.onCache('vehicle', function(value)
     inVehicle = value
     if value then
         DisplayRadar(true)
+        vehicleLoop(value)
         if not Config.enableStress or Config.stressWLJobs[job.name] or not Config.useStress.shooting then
             return
         end
         vehicleStressLoop(value)
-        vehicleLoop(value)
     else
         DisplayRadar(bypass)
         seatbelt = false
