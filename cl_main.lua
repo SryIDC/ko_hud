@@ -1,15 +1,20 @@
-local playerId, playerPed, inVehicle, hudVisible, seatbelt, weapon, playerloaded
+local playerId, inVehicle, hudVisible, seatbelt, weapon, playerloaded
 local job = {}
 local speedfactor = Config.useMiles and 2.236936 or 3.6
+local hunger = 100
+local thirst = 100
+local stress = 0
+local voice_type = 'mic_mute.png'
+local voice_talking = false
+local voice_radio = false
 
 exports('hudVisibility', function(toggle)
     hudVisible = toggle
     ToggleHud(toggle)
 end)
---
+
 -- HUD COMPONENTS
---
-DisplayRadar(false)
+
 if Config.componentsDisabler then
     CreateThread(function()
         while true do
@@ -41,12 +46,6 @@ RegisterCommand('cinematic', function()
     ToggleHud(not cinematic)
 end, false)
 
--- Need to set command
-CreateThread(function()
-    bypass = GetResourceKvpInt("toggle_minimap") == 1
-    DisplayRadar(bypass)
-end)
-
 --
 -- HUD LOCATION
 --
@@ -73,26 +72,10 @@ CreateThread(function()
 end)
 
 local directions = { "N", "NE", "E", "SE", "S", "SW", "W", "NW", "N" }
-
 local function getCardinalDirection(heading)
     local index = math.floor(((heading % 360) + 22.5) / 45) + 1
     return directions[index]
 end
-
-
---
--- HUD STATUS
---
-
-local hunger = 100
-local thirst = 100
-local stress = 0
-local voice_type = 'mic_mute.png'
-local voice_talking = false
-local voice_radio = false
-local lastShootTime = 0
-local lastStressCheck = 0
-
 AddStateBagChangeHandler('hunger', ('player:%s'):format(cache.serverId), function(_, _, value)
     hunger = value
 end)
@@ -102,23 +85,11 @@ AddStateBagChangeHandler('thirst', ('player:%s'):format(cache.serverId), functio
 end)
 
 AddStateBagChangeHandler('stress', ('player:%s'):format(cache.serverId), function(_, _, value)
-    stress = value
-    TriggerEvent('hud:stressChanged', value)
-end)
-
-
-
--- Function to safely increase stress
-local function increaseStress(amount)
-    if not Config.stressConfig or not Config.stressConfig.enabled then
+    if not Config.enableStress or Config.stressWLJobs[job.name] then
         return
     end
-    local newStress = stress + amount
-    if newStress > Config.stressConfig.maxStress then
-        newStress = Config.stressConfig.maxStress
-    end
-    LocalPlayer.state:set('stress', newStress, true)
-end
+    stress = math.min(100, value or 0)
+end)
 
 AddEventHandler("pma-voice:setTalkingMode", function(val)
     if val == 0 then
@@ -135,23 +106,6 @@ end)
 AddEventHandler("pma-voice:radioActive", function(radioTalking)
     voice_radio = radioTalking
 end)
-
--- Shooting stress detection
-local function holdingWeaponLoop()
-    while weapon do
-        if Config.stressConfig and Config.stressConfig.enabled and Config.stressConfig.shootingStress.enabled then
-            local isShooting = IsPedShooting(playerPed)
-            if isShooting then
-                local currentTime = GetGameTimer()
-                if currentTime - lastShootTime >= Config.stressConfig.shootingStress.cooldown then
-                    increaseStress(Config.stressConfig.shootingStress.increase)
-                    lastShootTime = currentTime
-                end
-            end
-        end
-        Wait(100)
-    end
-end
 
 -- CONFIGURATION
 --
@@ -189,10 +143,17 @@ CreateThread(function()
     })
 end)
 
+-- Disable before loading
+CreateThread(function()
+    DisplayRadar(false)
+end)
+
 function Init()
     playerloaded = true
     job = QBX.PlayerData.job
     ToggleHud(true)
+    bypass = GetResourceKvpInt("toggle_minimap") == 1
+    DisplayRadar(bypass)
     CreateThread(function()
         SendNUIMessage({
             component = 'position',
@@ -252,9 +213,6 @@ function Init()
                 if voice_radio then
                     voice = 'mic_radio.png'
                 end
-
-                if stress < 0 then stress = 0 end
-                if stress > 100 then stress = 100 end
                 voice_talking = NetworkIsPlayerTalking(playerId) == 1
                 visiblestate = true
                 SendNUIMessage({
@@ -358,32 +316,65 @@ function Init()
         end
     end)
 
-    -- Driving stress detection (speed without seatbelt)
-    CreateThread(function()
-        while true do
-            if Config.stressConfig and Config.stressConfig.enabled and Config.stressConfig.drivingStress.enabled then
-                if inVehicle then
-                    if cache.seat == -1 then
-                        local speed = GetEntitySpeed(inVehicle)
-                        local speedConverted = speed * speedfactor
-                        if speedConverted > Config.stressConfig.drivingStress.speedThreshold and not seatbelt then
-                            local currentTime = GetGameTimer()
 
-                            if currentTime - lastStressCheck >= Config.stressConfig.drivingStress.interval then
-                                increaseStress(Config.stressConfig.drivingStress.increase)
-                                lastStressCheck = currentTime
-                            end
-                        end
-                    end
-                end
+    local function GetBlurIntensity(stresslevel)
+        for _, v in pairs(Config.intensity) do
+            if stresslevel >= v.min and stresslevel <= v.max then
+                return v.intensity
             end
-            Wait(Config.stressConfig and Config.stressConfig.drivingStress.interval or 2000)
         end
-    end)
+        return 1500
+    end
 
+    local function GetEffectInterval(stresslevel)
+        for _, v in pairs(Config.effectInterval) do
+            if stresslevel >= v.min and stresslevel <= v.max then
+                return v.timeout
+            end
+        end
+        return 60000
+    end
 
+    -- STRESS EFFECTS
+    if Config.enableStress then
+        CreateThread(function()
+            while true do
+                local effectInterval = GetEffectInterval(stress)
+                if stress >= 100 then
+                    local BlurIntensity = GetBlurIntensity(stress)
+                    local FallRepeat = math.random(2, 4)
+                    local RagdollTimeout = FallRepeat * 1750
+                    local vcoords = GetEntityForwardVector(cache.ped)
+                    TriggerScreenblurFadeIn(1000.0)
+                    Wait(BlurIntensity)
+                    TriggerScreenblurFadeOut(1000.0)
+                    if not IsPedRagdoll(cache.ped) and IsPedOnFoot(cache.ped) and not IsPedSwimming(cache.ped) then
+                        SetPedToRagdollWithFall(cache.ped, RagdollTimeout, RagdollTimeout, 1, vcoords.x, vcoords.y,
+                            vcoords
+                            .z,
+                            1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+                    end
+                    Wait(1000)
+                    for _ = 1, FallRepeat, 1 do
+                        Wait(750)
+                        DoScreenFadeOut(200)
+                        Wait(1000)
+                        DoScreenFadeIn(200)
+                        TriggerScreenblurFadeIn(1000.0)
+                        Wait(BlurIntensity)
+                        TriggerScreenblurFadeOut(1000.0)
+                    end
+                elseif stress >= Config.screenShake then
+                    local BlurIntensity = GetBlurIntensity(stress)
+                    TriggerScreenblurFadeIn(1000.0)
+                    Wait(BlurIntensity)
+                    TriggerScreenblurFadeOut(1000.0)
+                end
+                Wait(effectInterval)
+            end
+        end)
+    end
     -- MINIMAP SETUP
-    --
 
     CreateThread(function()
         local scaleform = RequestScaleformMovie('minimap')
@@ -435,19 +426,53 @@ function Init()
     end)
 end
 
+-- Driving stress detection (speed without seatbelt)
+local function vehicleStressLoop(veh)
+    CreateThread(function()
+        while veh == cache.vehicle and cache.seat == -1 do
+            local vehClass = GetVehicleClass(veh)
+            local speed = GetEntitySpeed(veh) * speedfactor
+            local stressSpeed
+            if vehClass == 8 then -- Motorcycle exception for seatbelt
+                stressSpeed = Config.minimumSpeed
+            else
+                stressSpeed = seatbelt and Config.minimumSpeed or Config.unbuckledSpeed
+            end
+            if speed >= stressSpeed then
+                TriggerServerEvent('hud:server:GainStress', 1)
+            end
+            Wait(10000)
+        end
+    end)
+end
+
+-- Shooting stress detection
+local function holdingWeaponLoop()
+    CreateThread(function()
+        while cache.weapon do
+            if IsPedShooting(cache.ped) and not Config.weaponWLStress[cache.weapon] then
+                if math.random() < Config.shootingStressChance then
+                    TriggerServerEvent('hud:server:GainStress', 1)
+                end
+            end
+            Wait(0)
+        end
+    end)
+end
 --cache management
 
 lib.onCache('vehicle', function(value)
     inVehicle = value
     if value then
         DisplayRadar(true)
+        if not Config.enableStress or Config.stressWLJobs[job.name] or not Config.useStress.shooting then
+            return
+        end
+        vehicleStressLoop(value)
     else
         DisplayRadar(bypass)
         seatbelt = false
     end
-end)
-lib.onCache('ped', function(value)
-    playerPed = value
 end)
 lib.onCache('playerId', function(value)
     playerId = value
@@ -455,6 +480,9 @@ end)
 lib.onCache('weapon', function(value)
     weapon = value
     if weapon then
+        if not Config.enableStress or Config.stressWLJobs[job.name] or not Config.useStress.shooting then
+            return
+        end
         holdingWeaponLoop()
     end
 end)

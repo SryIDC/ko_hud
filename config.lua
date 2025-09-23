@@ -75,31 +75,82 @@ Config.enableVoice = true
 
 -- Activates/deactivates the armor bar display. [default = true]
 Config.enableArmor = true
-
--- Activates/deactivates the stress bar display. [default = true]
 Config.enableStress = true
+Config.useStress = {
+    shooting = true,
+    driving = true,
+}
+Config.screenShake = 70            -- Minimum stress level for screen shaking
+Config.shootingStressChance = 0.05 -- Percentage stress chance when shooting (0-1) (default = 10%)
+Config.unbuckledSpeed = 400        -- Going over this Speed will cause stress
+Config.minimumSpeed = 400          -- Going over this Speed will cause stress
+Config.stressWLJobs = {
+    police = true,
+    ambulance = true,
+}
 
--- Configure automatic stress increases
-Config.stressConfig = {
-    enabled = true,       -- Enable automatic stress increases
-    maxStress = 100,      -- Maximum stress level (0-100)
-    persistStress = true, -- Save/restore stress across resource restarts
+Config.weaponWLStress = { -- Disable gaining stress from weapons in this table
+    [`weapon_petrolcan`] = false,
+    [`weapon_hazardcan`] = false,
+    [`weapon_fireextinguisher`] = false
+}
 
-    -- Shooting stress
-    shootingStress = {
-        enabled = true,  -- Enable stress from shooting
-        increase = 1,    -- Stress increase per shot
-        cooldown = 1000, -- Cooldown between stress increases (ms)
+Config.intensity = {
+    [1] = {
+        min = 50,
+        max = 60,
+        intensity = 1500,
     },
+    [2] = {
+        min = 60,
+        max = 70,
+        intensity = 2000,
+    },
+    [3] = {
+        min = 70,
+        max = 80,
+        intensity = 2500,
+    },
+    [4] = {
+        min = 80,
+        max = 90,
+        intensity = 2700,
+    },
+    [5] = {
+        min = 90,
+        max = 100,
+        intensity = 3000,
+    },
+}
 
-    -- Driving stress (speed without seatbelt)
-    drivingStress = {
-        enabled = true,      -- Enable stress from dangerous driving
-        speedThreshold = 75, -- Speed threshold (mph/kmh based on Config.useMiles)
-        increase = 0.5,      -- Stress increase per interval
-        interval = 2000,     -- Check interval (ms)
+Config.effectInterval = {
+    [1] = {
+        min = 50,
+        max = 60,
+        timeout = math.random(50000, 60000)
+    },
+    [2] = {
+        min = 60,
+        max = 70,
+        timeout = math.random(40000, 50000)
+    },
+    [3] = {
+        min = 70,
+        max = 80,
+        timeout = math.random(30000, 40000)
+    },
+    [4] = {
+        min = 80,
+        max = 90,
+        timeout = math.random(20000, 30000)
+    },
+    [5] = {
+        min = 90,
+        max = 100,
+        timeout = math.random(15000, 20000)
     }
 }
+
 
 -- Activates/deactivates the bank balance display. [default = true]
 Config.enableBankBalance = true

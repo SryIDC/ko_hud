@@ -19,7 +19,7 @@ files {
 client_scripts {
     '@qbx_core/modules/playerdata.lua',
     'config.lua',
-    'cl_*.lua'
+    'cl_main.lua'
 }
-
+server_script 'server.lua'
 lua54 'yes'
