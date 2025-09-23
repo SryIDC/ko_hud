@@ -318,6 +318,7 @@ function Init()
 end
 
 local function vehicleLoop(veh)
+    local vehhud = false
     CreateThread(function()
         while cache.vehicle do
             if hudVisible then
@@ -330,6 +331,7 @@ local function vehicleLoop(veh)
                 if zones[string.upper(zone)] then
                     zoneText = zones[string.upper(zone)]
                 end
+                vehhud = true
                 SendNUIMessage({
                     component = 'position',
                     heading = heading,
@@ -340,12 +342,22 @@ local function vehicleLoop(veh)
                     zone = zoneText
                 })
             else
-                SendNUIMessage({
-                    component = 'position',
-                    visible = false
-                })
+                if vehhud then
+                    vehhud = false
+                    SendNUIMessage({
+                        component = 'position',
+                        visible = false
+                    })
+                end
             end
             Wait(Config.globalUpdateTime)
+        end
+        if vehhud then
+            vehhud = false
+            SendNUIMessage({
+                component = 'position',
+                visible = false
+            })
         end
     end)
     --
@@ -399,6 +411,13 @@ local function vehicleLoop(veh)
             end
 
             Wait(Config.globalUpdateTime)
+        end
+        if vehiclehud then
+            vehiclehud = false
+            SendNUIMessage({
+                component = 'speedometer',
+                visible = false
+            })
         end
     end)
 end
