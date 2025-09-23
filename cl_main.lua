@@ -8,11 +8,6 @@ local voice_type = 'mic_mute.png'
 local voice_talking = false
 local voice_radio = false
 
-exports('hudVisibility', function(toggle)
-    hudVisible = toggle
-    ToggleHud(toggle)
-end)
-
 -- HUD COMPONENTS
 
 if Config.componentsDisabler then
@@ -43,7 +38,6 @@ end, false)
 RegisterCommand('cinematic', function()
     cinematic = not cinematic
     hudVisible = not cinematic
-    ToggleHud(not cinematic)
 end, false)
 
 --
@@ -109,18 +103,17 @@ end)
 
 -- CONFIGURATION
 --
-function ToggleHud(bool)
+function UpdateInfo()
     SendNUIMessage({
         component = 'playerId',
-        visible = bool,
-        playerId = bool and cache.serverId
+        visible = hudVisible,
+        playerId = hudVisible and cache.serverId
     })
-
     SendNUIMessage({
         component = 'job',
-        visible = bool,
-        jobName = bool and job.label,
-        jobGrade = bool and job.grade.name .. (job.onduty and '' or ' (Off Duty)')
+        visible = hudVisible,
+        jobName = hudVisible and job.label,
+        jobGrade = hudVisible and job.grade.name .. (job.onduty and '' or ' (Off Duty)')
     })
 end
 
@@ -149,9 +142,10 @@ CreateThread(function()
 end)
 
 function Init()
+    hudVisible = true
     playerloaded = true
     job = QBX.PlayerData.job
-    ToggleHud(true)
+    UpdateInfo()
     bypass = GetResourceKvpInt("toggle_minimap") == 1
     DisplayRadar(bypass)
     CreateThread(function()
@@ -495,10 +489,12 @@ AddEventHandler('qbx_seatbelt:client:togglebelt', function(bool)
 end)
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(job)
     job = job
+     UpdateInfo()
 end)
 
 RegisterNetEvent('QBCore:Client:SetDuty', function(onDuty)
     job.onduty = onDuty
+     UpdateInfo()
 end)
 
 CreateThread(function()
