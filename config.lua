@@ -75,7 +75,7 @@ Config.enableVoice = true
 
 -- Activates/deactivates the armor bar display. [default = true]
 Config.enableArmor = true
-Config.enableStress = true
+Config.enableStress = false
 Config.useStress = {
     shooting = true,
     driving = true,
