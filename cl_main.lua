@@ -1,4 +1,4 @@
-local playerId, inVehicle, hudVisible, seatbelt, weapon, playerloaded
+local inVehicle, hudVisible, seatbelt, weapon
 local job = {}
 local speedfactor = Config.useMiles and 2.236936 or 3.6
 local hunger = 100
@@ -46,19 +46,9 @@ end, false)
 -- HUD LOCATION
 --
 
--- local activeCoords = vec2(0.0, 0.0)
--- local postalText = 'CP 0000'
--- local postals = {}
 local zones = {}
 
 CreateThread(function()
-    -- local postalsJson = LoadResourceFile(GetCurrentResourceName(), 'zips.json')
-    -- postalsJson = json.decode(postalsJson)
-
-    -- for i, postal in ipairs(postalsJson) do
-    --     postals[i] = { vec2(postal.x, postal.y), code = postal.code }
-    -- end
-
     local zonesJson = LoadResourceFile(GetCurrentResourceName(), 'zones.json')
     zonesJson = json.decode(zonesJson)
 
@@ -78,6 +68,9 @@ end)
 
 AddStateBagChangeHandler('thirst', ('player:%s'):format(cache.serverId), function(_, _, value)
     thirst = value
+end)
+AddStateBagChangeHandler('seatbelt', ('player:%s'):format(cache.serverId), function(_, _, value)
+    seatbelt = value
 end)
 
 AddStateBagChangeHandler('stress', ('player:%s'):format(cache.serverId), function(_, _, value)
@@ -145,8 +138,17 @@ end)
 
 function Init()
     hudVisible = true
-    playerloaded = true
     job = QBX.PlayerData.job
+    local value = LocalPlayer.state.proximity.index
+    if value == 0 then
+        voice_type = 'mic_mute.png'
+    elseif value == 1 then
+        voice_type = 'mic_one.png'
+    elseif value == 2 then
+        voice_type = 'mic_two.png'
+    elseif value == 3 then
+        voice_type = 'mic_three.png'
+    end
     UpdateInfo()
     bypass = GetResourceKvpInt("toggle_minimap") == 1
     DisplayRadar(bypass)
@@ -159,7 +161,7 @@ function Init()
                 if voice_radio then
                     voice = 'mic_radio.png'
                 end
-                voice_talking = NetworkIsPlayerTalking(playerId) == 1
+                voice_talking = NetworkIsPlayerTalking(cache.playerId) == 1
                 visiblestate = true
                 SendNUIMessage({
                     component = 'status',
@@ -177,7 +179,7 @@ function Init()
                     hunger = hunger,
                     thirst = thirst,
                     stress = stress,
-                    oxygen = GetPlayerUnderwaterTimeRemaining(playerId)
+                    oxygen = GetPlayerUnderwaterTimeRemaining(cache.playerId)
                 })
             else
                 if visiblestate then
@@ -352,13 +354,11 @@ local function vehicleLoop(veh)
             end
             Wait(Config.globalUpdateTime)
         end
-        if vehhud then
-            vehhud = false
-            SendNUIMessage({
-                component = 'position',
-                visible = false
-            })
-        end
+        vehhud = false
+        SendNUIMessage({
+            component = 'position',
+            visible = false
+        })
     end)
     --
     -- HUD SPEEDOMETER
@@ -412,13 +412,11 @@ local function vehicleLoop(veh)
 
             Wait(Config.globalUpdateTime)
         end
-        if vehiclehud then
-            vehiclehud = false
-            SendNUIMessage({
-                component = 'speedometer',
-                visible = false
-            })
-        end
+        vehiclehud = false
+        SendNUIMessage({
+            component = 'speedometer',
+            visible = false
+        })
     end)
 end
 
@@ -471,9 +469,6 @@ lib.onCache('vehicle', function(value)
         seatbelt = false
     end
 end)
-lib.onCache('playerId', function(value)
-    playerId = value
-end)
 lib.onCache('weapon', function(value)
     weapon = value
     if weapon then
@@ -490,8 +485,8 @@ AddEventHandler('QBCore:Client:OnPlayerLoaded', Init)
 AddEventHandler('qbx_seatbelt:client:togglebelt', function(bool)
     seatbelt = bool
 end)
-RegisterNetEvent('QBCore:Client:OnJobUpdate', function(job)
-    job = job
+RegisterNetEvent('QBCore:Client:OnJobUpdate', function(jobdata)
+    job = jobdata
     UpdateInfo()
 end)
 
